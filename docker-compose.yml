@@ -1,0 +1,27 @@
+version: "3"
+services:
+  server:
+    build:
+      context: .
+      target: server
+    container_name: server_container
+    ports:
+      - "5000:5000"
+    links:
+      - db
+  db:
+    build:
+      context: .
+      target: database
+    container_name: database_container
+
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2b4djnm3ed2dms
+      - POSTGRES_DB=postgres
+    expose:
+      - 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
