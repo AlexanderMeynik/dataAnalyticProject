@@ -1,29 +1,30 @@
+import time
+
 import psycopg2
 
 
 class databaseService():
     def __init__(self):
-        #т.к. звпускаем из  сам сервак из докера теперь строка будет такой)
-        self.connection = psycopg2.connect(database="postgres",
-                                           user="postgres",
-                                           host='db',
-                                           password="2b4djnm3ed2dms",
-                                           port=5432)
+        # т.к. звпускаем из  сам сервак из докера теперь строка будет такой)
+        while (True):
+            try:
+                self.connection = psycopg2.connect(database="postgres",
+                                                       user="postgres",
+                                                       host='db',
+                                                       password="2b4djnm3ed2dms",
+                                                       port=5432)
+
+                time.sleep(1)
+                break
+            except psycopg2.OperationalError as e:
+                time.sleep(1)
 
     def __del__(self):
         self.connection.close()
-    #неясно пока зачем но пусть будет
-    def retryConnection(self):
-        try:
-            if (not self.connection):
-                self.connection = psycopg2.connect(database="postgres",
-                                           user="postgres",
-                                           host='db',
-                                           password="2b4djnm3ed2dms",
-                                           port=5432)
-        except Exception as e:
-            print("dbService:retryConnection" + e.__str__())
-            exit(1)
+
+    # неясно пока зачем но пусть будет
+
+
 
     def getTopTag(self, num_tags=100):
         rows = []
@@ -115,7 +116,7 @@ class databaseService():
                 cursor.close()
             return rows
 
-    def top_pairs_top_tags(self, top_tags=10,pairs_count=10):
+    def top_pairs_top_tags(self, top_tags=10, pairs_count=10):
         rows = []
         try:
             cursor = self.connection.cursor()
@@ -220,7 +221,7 @@ class databaseService():
                 cursor.close()
             return rows
 
-    def find_articles_by_tittle_size(self,size):
+    def find_articles_by_tittle_size(self, size):
         rows = []
         cursor = False;
         try:
@@ -271,4 +272,3 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-
