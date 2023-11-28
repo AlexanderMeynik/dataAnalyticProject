@@ -7,4 +7,5 @@
   SELECT create_distributed_table('public.articles', 'article_id');
   SELECT create_distributed_table('public.journals', 'id');
   \q
+  
 На данный момент клиент не упакован в докер т.к. его базовая реализация ещё не сделана. По даннйо причине пока запросы к к flask серверу надо начинать с url "'http://127.0.0.1:5500", при тестах с браузера или postman.
