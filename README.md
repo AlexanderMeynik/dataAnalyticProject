@@ -7,9 +7,13 @@
 При запущенной бд можно её шардировать(установлен плагин citus data) при помощи данного кода.
 
 SELECT create_distributed_table('public.articles', 'article_id');
+
 SELECT create_distributed_table('public.journals', 'id');
+
 SELECT truncate_local_data_after_distributing_table($$public.articles$$);
+
 SELECT truncate_local_data_after_distributing_table($$public.journals$$);
+
 \q
 Повторно данный процесс выполнять не надо, поскольку всё сохраниться в data volume.
 
