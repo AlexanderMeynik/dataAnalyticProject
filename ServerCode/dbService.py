@@ -1,30 +1,42 @@
 import time
 
 import psycopg2
+from configparser import ConfigParser
 
 
 class databaseService():
-    def __init__(self):
+    host = ""
+    port = ""
+
+    def __init__(self, arg):
+
+        config = ConfigParser()
+        config.read('config.ini')
+        section = 'service_docker' if arg else 'service_local'
+        host = config.get(section, 'ip')
+        port = config.get(section, 'port')
+
+        reset_count = 0
         # т.к. звпускаем из  сам сервак из докера теперь строка будет такой)
         while (True):
             try:
                 self.connection = psycopg2.connect(database="postgres",
-                                                       user="postgres",
-                                                       host='db',
-                                                       password="2b4djnm3ed2dms",
-                                                       port=5432)
-
+                                                   user="postgres",
+                                                   host=host,
+                                                   password="2b4djnm3ed2dms",
+                                                   port=port)
                 time.sleep(1)
                 break
             except psycopg2.OperationalError as e:
                 time.sleep(1)
+                if (reset_count > 500):
+                    raise psycopg2.OperationalError
+                reset_count = reset_count + 1
 
     def __del__(self):
         self.connection.close()
 
     # неясно пока зачем но пусть будет
-
-
 
     def getTopTag(self, num_tags=100):
         rows = []
@@ -186,7 +198,7 @@ class databaseService():
             cursor.execute(
                 f"""select subject,count(*) as tag_score from
                         (select article_id,unnest(subjects) as subject from articles where 'COVID-19'=any(subjects)) as subj
-                    where subject!={tag_name}
+                    where subject!='{tag_name}'
                     group by subject
                     order by tag_score desc limit {pairs_count};""")
             self.connection.commit()

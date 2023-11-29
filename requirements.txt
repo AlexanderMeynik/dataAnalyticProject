@@ -3,3 +3,4 @@ pandas
 psycopg2
 flask-restful
 requests
+waitress

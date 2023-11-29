@@ -9,6 +9,21 @@ services:
       - "5000:5000"
     links:
       - db
+    profiles:
+      - prod
+  server_dev:
+    build:
+      context: .
+      target: server
+    container_name: server_container
+    ports:
+      - "5000:5000"
+    links:
+      - db
+    volumes:
+      - ./ServerCode:/home/app/code
+    profiles:
+      - dev
   db:
     build:
       context: .

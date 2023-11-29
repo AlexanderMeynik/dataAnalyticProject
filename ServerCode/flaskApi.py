@@ -1,14 +1,22 @@
 import os
+import sys
+import time
 
 import psycopg2
 from flask import Flask
 from dbService import databaseService
-from flask import current_app, flash, jsonify, make_response, redirect, request, url_for
-import json
+from flask import jsonify, request
 
 app = Flask(__name__)
-db = databaseService()
+docker = True
+if len(sys.argv) >= 2 and sys.argv[1] == 'local':
+    docker = False
 
+db = databaseService(docker)
+
+@app.get('/')
+def index():
+    return jsonify("hello client"),200
 
 @app.get('/top_tags')
 def send_top_tags():
@@ -107,4 +115,11 @@ def findtopAuthors():
 
 
 port = int(os.environ.get('PORT', 5000))
-app.run(debug=True, host='0.0.0.0', port=port)
+print('signals')
+#from waitress import serve
+
+
+#app.run(debug=True, host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=port)
+    #serve(app, host="0.0.0.0", port=port)#todo try to run with waitress

@@ -17,7 +17,7 @@ class requestor:
         # пока не упаковал в докер ip будет таким
         self.url_start = 'http://127.0.0.1:5000'
 
-    def get_top_tags(self, tag_count):
+    def get_top_tags(self, tag_count=10):
         r = requests.get(self.url_start + '/top_tags', params={'tag_count': tag_count})
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
@@ -68,9 +68,9 @@ class requestor:
         cover_dates = [element[1] for element in arrays]  # string[]
         return article_ids, cover_dates
 
-    def get_pairs_for_one_tag(self, tag_name):
+    def get_pairs_for_one_tag(self, tag_name,pair_count=10):
         r = requests.get(self.url_start + '/top_pairs',
-                         params={'tag_name': tag_name})
+                         params={'tag_name': tag_name,'pair_count':pair_count})
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
         paired_subjects = [element[0] for element in arrays]  # string[]
@@ -97,9 +97,9 @@ class requestor:
         tittles = [element[2] for element in arrays]  # string[]
         return article_ids, word_counts, tittles
 
-    def get_top_authors(self):
+    def get_top_authors(self,author_count=10):
         r = requests.get(self.url_start + '/get_top_authors',
-                         )
+                         params={'author_count': author_count})
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
         creators = [element[0] for element in arrays]  # string[]
