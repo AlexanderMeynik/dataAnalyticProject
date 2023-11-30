@@ -48,7 +48,7 @@ def top_mth_tag():
         else:
             return jsonify(db.top_mounth_tags()), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting monthly tags" + error, 401
 
 
 @app.get('/top_pairs_top_tags')
@@ -59,7 +59,7 @@ def tag_pair_top_tags():
     try:
         return jsonify(db.top_pairs_top_tags(top_count, top_pairs)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting top pairs for top tags" + error, 401
 
 
 @app.get('/get_articles_by_tag')
@@ -82,7 +82,7 @@ def gettagstoppairs():
     try:
         return jsonify(db.top_pairs(name, count)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting top pairs for tag" + error, 401
 
 
 @app.get('/size_histogram')
@@ -90,7 +90,7 @@ def hist1():
     try:
         return jsonify(db.histogram()), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting title size histogram" + error, 401
 
 
 @app.get('/find_articles_by_tittle_size')
@@ -98,11 +98,10 @@ def tittlesizefind():
     wordcount = request.args.get('size')
     if not wordcount:
         return "Not supported argument configuration", 400
-    count = request.args.get('pair_count')
     try:
         return jsonify(db.find_articles_by_tittle_size(wordcount)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting articles with specific tag size" + error, 401
 
 
 @app.get('/get_top_authors')
@@ -111,11 +110,11 @@ def findtopAuthors():
     try:
         return jsonify(db.get_top_authors(author_count)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting tag dynamics" + error, 401
+        return "Error getting top authors" + error, 401
 
 
 port = int(os.environ.get('PORT', 5000))
-print('signals')
+
 #from waitress import serve
 
 

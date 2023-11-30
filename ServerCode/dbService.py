@@ -43,13 +43,7 @@ class databaseService():
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                f"""select subject,count(article_id) as tag_score
-                             from (
-                             select article_id,unnest(subjects) as subject
-                             from articles
-                             order by article_id) as foo
-                             group by (subject)
-                             order by tag_score DESC limit {num_tags};""")
+                f"""select * from top_tags_all limit {num_tags};""")
 
             self.connection.commit()
             rows = cursor.fetchall()
@@ -88,33 +82,14 @@ class databaseService():
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                f"""WITH ranked_tags AS (
-                SELECT
-                    subject,
-                    year,
-                    month,
-                    COUNT(article_id) AS tag_score,
-                    ROW_NUMBER() OVER (PARTITION BY year, month ORDER BY COUNT(article_id) DESC) AS rnk
-                FROM
-                    (
-                        SELECT
-                            article_id,
-                            UNNEST(subjects) AS subject,
-                            EXTRACT(year FROM cover_date) AS year,
-                            EXTRACT(month FROM cover_date) AS month
-                        FROM
-                            articles
-                    ) AS foo
-                GROUP BY
-                    year, month, subject
-            )
+                f"""
             SELECT
                 subject,
                 year,
                 month,
                 tag_score
             FROM
-                ranked_tags
+                tags_ordered_by_dates
             WHERE
                     rnk <= {tag_count}
             ORDER BY
@@ -134,14 +109,9 @@ class databaseService():
             cursor = self.connection.cursor()
             cursor.execute(
                 f"""with top_tags as(
-                        select subject as main_tag,count(article_id) as tag_score
-                        from (
-                                 select article_id,unnest(subjects) as subject
-                                 from articles
-                                 order by article_id) as foo
-                        group by subject
-                        order by tag_score DESC limit {top_tags}),
-                        
+                        select main_tag,tag_score
+                        from top_tags_all
+						limit {top_tags}),
                          joined_info as
                              (
                                  select top_tags.main_tag,top_tags.tag_score,unnest(array_remove(subjects,top_tags.main_tag)) as subject
@@ -197,7 +167,7 @@ class databaseService():
             cursor = self.connection.cursor()
             cursor.execute(
                 f"""select subject,count(*) as tag_score from
-                        (select article_id,unnest(subjects) as subject from articles where 'COVID-19'=any(subjects)) as subj
+                        (select article_id,unnest(subjects) as subject from articles where '{tag_name}'=any(subjects)) as subj
                     where subject!='{tag_name}'
                     group by subject
                     order by tag_score desc limit {pairs_count};""")
@@ -214,15 +184,9 @@ class databaseService():
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                f"""select data.size as word_count,count(article_id) as count_articles
+                f"""select size as word_count,count(article_id) as count_articles
                     from
-                        (select words.article_id,array_length(array_agg(words.title_words),1) as size
-                         from (
-                                  select article_id,unnest(regexp_matches(title, '(\w+)', 'g')) as title_words
-                                  from articles
-                              ) as words
-                         group by words.article_id
-                        ) as data    
+                        words_tittle 
                     group by word_count
                     order by word_count;
                     """)
@@ -241,15 +205,7 @@ class databaseService():
             cursor.execute(
                 f"""select data.article_id ,data.size as word_count, a.title
                     from
-                        (
-                            select words.article_id,array_length(array_agg(words.title_words),1) as size
-                            from (
-                                     select article_id,unnest(regexp_matches(title, '(\w+)', 'g')) as title_words
-                                     from articles
-                                 ) as words
-                            group by words.article_id
-                    
-                        ) as data join articles a on data.article_id=a.article_id
+                        words_tittle as data join articles a on data.article_id=a.article_id
                     where size={size};
                     """)
             self.connection.commit()

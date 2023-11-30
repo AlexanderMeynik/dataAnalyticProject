@@ -1,11 +1,9 @@
-# Use the official Citus Docker image as the base image
 FROM citusdata/citus as database
-COPY ../dumpFile.sql /docker-entrypoint-initdb.d/
+#COPY ../dumpFile.sql /docker-entrypoint-initdb.d/
 
 
 
 FROM python:3.11 as server_env
-#COPY ../ServerCode/   /home/app/code
 COPY requirements.txt /home/app/
 WORKDIR /home/app
 RUN pip install -r requirements.txt
