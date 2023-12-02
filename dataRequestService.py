@@ -83,9 +83,28 @@ class requestor:
         r = requests.get(self.url_start + '/size_histogram')
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
+        sizes = [element[0] for element in arrays]  #int[] в запросе 2 колонки вернуться, заберём их в массивы
+        element_count = [element[1] for element in arrays] #int[]
+        return sizes, element_count
+    def get_auth_hist(self):
+        # пока коды не проверял вообще
+        r = requests.get(self.url_start + '/auth_count_histogram')
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
         sizes = [element[0] for element in arrays]  # в запросе 2 колонки вернуться, заберём их в массивы
         element_count = [element[1] for element in arrays]
         return sizes, element_count
+
+    def get_auth_subj_count_hist(self,size=10):
+        # пока коды не проверял вообще
+        r = requests.get(self.url_start + '/authors_subject_counts_histogram',params={'size': size})
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+        auth_count = [element[0] for element in arrays]  # int[]
+        subj_count = [element[1] for element in arrays]  # int[]
+        article_count = [element[2] for element in arrays]  # int[]
+        percentages = [element[3] for element in arrays]  # float[]
+        return auth_count, subj_count, article_count, percentages
 
     def get_articles_with_title_word_count(self, size):
         r = requests.get(self.url_start + '/find_articles_by_tittle_size',
@@ -106,3 +125,7 @@ class requestor:
         article_counts = [element[1] for element in arrays]  # int[]
 
         return creators, article_counts
+
+#rq=requestor()
+#res=rq.get_auth_subj_count_hist()
+#[print(elem) for elem in res]

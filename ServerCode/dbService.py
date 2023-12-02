@@ -53,7 +53,7 @@ class databaseService():
                 cursor.close()
             return rows
 
-    def getTagsDynamics(self, tag_name):
+    def getTagsDynamics(self, tag_name, year=2020, month=2020):
         rows = []
         try:
             cursor = self.connection.cursor()
@@ -189,6 +189,49 @@ class databaseService():
                         words_tittle 
                     group by word_count
                     order by word_count;
+                    """)
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def author_histogram(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""select array_length(creators,1) as auth_count,count(article_id) as count_articles
+                    from
+                        articles
+                    where creators is not null
+                    group by array_length(creators,1)
+                    order by array_length(creators,1);
+                    """)
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def authors_subject_counts_hist(self,size=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""select auth_count,subj_count,count_articles, round(100*count_articles/(sum(count_articles) over (partition by auth_count)),2) percent from
+                        (select array_length(creators,1) as auth_count,array_length(subjects,1) as subj_count,count(article_id) as count_articles,
+                        dense_rank() over (PARTITION BY array_length(creators,1) order by count(article_id) desc ) as rnk
+                        from
+                        articles
+                        where creators is not null and articles.subjects is not null
+                        group by array_length(creators,1), array_length(subjects,1)) as data
+                    where rnk<={size}
+                    order by auth_count,count_articles desc;
                     """)
             self.connection.commit()
             rows = cursor.fetchall()

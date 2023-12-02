@@ -92,6 +92,20 @@ def hist1():
     except (Exception, psycopg2.Error) as error:
         return "Error getting title size histogram" + error, 401
 
+@app.get('/auth_count_histogram')
+def hist2():
+    try:
+        return jsonify(db.author_histogram()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting title size histogram" + error, 401
+
+@app.get('/authors_subject_counts_histogram')
+def hist3():
+    size = request.args.get('size')
+    try:
+        return jsonify(db.authors_subject_counts_hist(size)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting title size histogram" + error, 401
 
 @app.get('/find_articles_by_tittle_size')
 def tittlesizefind():
