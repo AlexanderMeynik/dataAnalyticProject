@@ -130,16 +130,6 @@ class requestor:
 
         return creators, article_counts
 
-    def get_top_authors(self,author_count=10):
-        r = requests.get(self.url_start + '/get_top_authors',
-                         params={'author_count': author_count})
-        self.check_status(r)
-        arrays = dec.decode(r.content.decode())
-        creators = [element[0] for element in arrays]  # string[]
-        article_counts = [element[1] for element in arrays]  # int[]
-
-        return creators, article_counts
-
     def get_all_journals_dynamic(self):
         #todo забрал все динамик журналов по годам
         # можно забирать статистики для 1 журнала используя pandas
@@ -197,7 +187,7 @@ class requestor:
 
         #rnk = [element[3] for element in arrays]  # int[]
         return journal_names, subject, tag_counts
-    def get_top_tags_for_all_journals(self, group_count=10):
+    def get_top_authors_for_all_journals(self, group_count=10):
         #todo аналогично предыдущему, но выводит top group_count
         #авторов по числу публикаций в журнале
 
@@ -213,7 +203,7 @@ class requestor:
         #rnk = [element[3] for element in arrays]  # int[]
         return journal_names, creator, articles_published
 
-    def get_top_tags_for_all_journals(self):
+    def get_top_authors_by_journal_num(self):
         #это топ авторов по числу журналов, где он опубликовался
         #т.к. у меня нет данных об id автора
         # я не могу точно сказать будет ли 2 Wan Wey одним человеком
@@ -227,7 +217,7 @@ class requestor:
 
         creator = [element[0] for element in arrays]  # string[]
         journal_count = [element[1] for element in arrays]  # int[]
-        return creator,journal_count;
+        return creator,journal_count
 
 rq=requestor()
 res=rq.get_top_tags_for_all_journals()
