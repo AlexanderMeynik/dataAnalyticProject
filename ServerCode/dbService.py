@@ -283,3 +283,100 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
+    def get_journal_dynamic_all(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                'select name,year,month,article_count from journal_dynamic_data'
+                   )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def get_journals_for_dynamics(self,group_count=10):
+            rows = []
+            cursor = False;
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute(
+                    f"""with counts_dyn as(
+                            select id,name, count(article_count) as mounth_pubs,
+                            sum(article_count) as total_articles,
+                            sum(article_count)/count(article_count) as articles_per_month
+                            from journal_dynamic_data
+                            group by id, name
+                        ),
+                        artic as(
+                            select *
+                            ,row_number() over (PARTITION BY mounth_pubs order by articles_per_month desc,name desc  ) as rnk
+                            from counts_dyn
+                        )
+    
+                        select name,mounth_pubs,total_articles,articles_per_month,rnk
+                        from artic where rnk<={group_count}
+                        order by mounth_pubs desc,rnk;"""
+                       )
+                self.connection.commit()
+                rows = cursor.fetchall()
+            finally:
+                if self.connection:
+                    cursor.close()
+                return rows
+
+    def get_top_tags_in_journals(self, group_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""select name,subject,tag_count,rnk
+                    from journal_top_tags
+                    where rnk<={group_count}
+                    order by name,tag_count desc;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+    def get_top_authors_in_journals(self, group_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""select name,creator,creator_num_articles,rnk
+                from journal_top_authors
+                where rnk<={group_count}
+                order by name,creator_num_articles desc;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+    def get_top_authors_by_journal_count(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select creator,count(creator_num_articles)
+                from journal_top_authors
+                group by creator
+                order by count(creator_num_articles) desc;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows

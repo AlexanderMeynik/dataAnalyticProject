@@ -1,8 +1,10 @@
 import dash
-from dash import dcc, html, Output, Input, callback, Patch
+from dash import dcc, html, Output, Input, callback
 import pandas as pd
-from dataRequestService import requestor
+
 import plotly.express as px
+
+from dataRequestService import requestor
 
 rq = requestor()
 
@@ -64,11 +66,6 @@ def refresh_graphs2(val):
     output = []
 
     output.append(html.P(f"Header in div {val},size {len(df2)}"));
-
-    # for elem in df2:
-    #    output.append(px.pie(paired_tags_data[paired_tags_data[first_df_names[0]] == elem], names=first_df_names[1],
-    #           values=first_df_names[2], title='Круговая диаграмма распределения статей по количеству '
-    #                                             'ключевых слов'))
     for elem in df2:
         figure = px.pie(paired_tags_data[paired_tags_data[first_df_names[0]] == elem],
                         names=first_df_names[1],

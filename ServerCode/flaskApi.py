@@ -126,9 +126,50 @@ def findtopAuthors():
     except (Exception, psycopg2.Error) as error:
         return "Error getting top authors" + error, 401
 
+@app.get('/get_all_journal_pub_frequency')
+def get_all_dyn():
+    try:
+        return jsonify(db.get_journal_dynamic_all()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
 
 port = int(os.environ.get('PORT', 5000))
 
+
+@app.get('/get_journals_for_dynamics')
+def get_journ_for_dyn():
+    group_count = request.args.get('group_count')
+    try:
+        return jsonify(db.get_journals_for_dynamics(group_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
+@app.get('/get_top_tags_for_all_journals')
+def get_top_tags_for_all_journals():
+    group_count = request.args.get('group_count')
+    try:
+        return jsonify(db.get_top_tags_in_journals(group_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
+@app.get('/get_top_creators_for_all_journals')
+def get_top_creators_for_all_journals():
+    group_count = request.args.get('group_count')
+    try:
+        return jsonify(db.get_top_authors_in_journals(group_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
+@app.get('/get_top_authors_by_journals_count')
+def get_top_creators_by_journal_count():
+    try:
+        return jsonify(db.get_top_authors_by_journal_count()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
+
+port = int(os.environ.get('PORT', 5000))
 #from waitress import serve
 
 

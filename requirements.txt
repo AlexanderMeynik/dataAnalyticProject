@@ -4,3 +4,7 @@ psycopg2
 flask-restful
 requests
 waitress
+pandas
+plotly
+dash
+requests

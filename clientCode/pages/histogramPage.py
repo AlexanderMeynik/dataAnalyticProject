@@ -1,8 +1,10 @@
 import dash
 from dash import dcc, html, Output, Input, callback
 import pandas as pd
-from dataRequestService import requestor
+
 import plotly.express as px
+
+from dataRequestService import requestor
 
 rq = requestor()
 # res = rq.get_pairs_for_one_tag('COVID-19', 10)

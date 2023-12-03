@@ -1,8 +1,7 @@
-import psycopg2
 import time
 start_time = time.time()
 
-from dataRequestService import requestor
+from clientCode.dataRequestService import requestor
 
 rq = requestor()
 '''rq.get_tag_dynamics(tag_name='COVID-19')

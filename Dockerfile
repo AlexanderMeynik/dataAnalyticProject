@@ -9,7 +9,6 @@ WORKDIR /home/app
 RUN pip install -r requirements.txt
 
 
-
 FROM server_env as server
 COPY ../ServerCode/   /home/app/code
 WORKDIR /home/app/code
@@ -20,5 +19,11 @@ FROM server_env as server_dev
 WORKDIR /home/app/code
 ENTRYPOINT ["python3","flaskApi.py"]
 CMD ["bash"]
+
+FROM server_env as client_dev
+WORKDIR /home/app/code
+ENTRYPOINT ["python3","app.py"]
+CMD ["bash"]
+
 
 

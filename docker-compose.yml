@@ -1,5 +1,18 @@
 version: "3"
 services:
+  client_dev:
+    build:
+      context: .
+      target: client_dev
+    container_name: client_container
+    expose:
+      - 8050
+    ports:
+      - "5001:8050"
+    profiles:
+      - client
+    volumes:
+      - ./clientCode:/home/app/code
   server:
     build:
       context: .
@@ -11,6 +24,8 @@ services:
       - db
     profiles:
       - prod
+    networks:
+      serv:
   server_dev:
     build:
       context: .
@@ -24,6 +39,8 @@ services:
       - ./ServerCode:/home/app/code
     profiles:
       - dev
+    networks:
+      serv:
   db:
     build:
       context: .
@@ -38,5 +55,9 @@ services:
       - 5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      serv:
 volumes:
   pgdata:
+networks:
+  serv:
