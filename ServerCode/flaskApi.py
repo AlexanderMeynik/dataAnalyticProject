@@ -168,6 +168,13 @@ def get_top_creators_by_journal_count():
     except (Exception, psycopg2.Error) as error:
         return "Error getting top authors" + error, 401
 
+@app.get('/get_all_tags_dynamics')
+def get_all_tags_dynamics():
+    try:
+        return jsonify(db.get_all_tags_dynamics()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors" + error, 401
+
 
 port = int(os.environ.get('PORT', 5000))
 #from waitress import serve

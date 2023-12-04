@@ -58,15 +58,8 @@ class databaseService():
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                f"""select subject,year,month,count(article_id) as tag_score  
-                       from (
-                       select article_id,unnest(subjects) as subject,extract(month FROM cover_date) as month,
-                       extract(year FROM cover_date) as year
-                       from articles
-                       where '{tag_name}'=any(subjects)) as foo
-                       where subject = '{tag_name}'
-                       group by year,month,subject
-                       order by year desc,month desc,tag_score DESC;""")
+                f"""select * from all_tags_dynamics
+                       where subject = '{tag_name}';""")
 
             self.connection.commit()
             rows = cursor.fetchall()
@@ -130,7 +123,8 @@ class databaseService():
                                  from  calculated_counts
                              )
                     
-                    select main_tag,subject,round(second_tag_score*100.00/sum(second_tag_score) over (partition by main_tag),2) as percentage
+                    select main_tag,subject,round(second_tag_score*100.00/sum(second_tag_score) over (partition by main_tag),2) as percentage,
+                    round(second_tag_score*100.00/tag_score,2) as total_percentage
                     from ranked_info
                     where rnk<={pairs_count}
                     order by tag_score desc, second_tag_score desc;""")
@@ -373,6 +367,22 @@ class databaseService():
                 from journal_top_authors
                 group by creator
                 order by count(creator_num_articles) desc;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def get_all_tags_dynamics(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select * from all_tags_dynamics;"""
             )
             self.connection.commit()
             rows = cursor.fetchall()
