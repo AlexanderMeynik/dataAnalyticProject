@@ -159,23 +159,46 @@ def get_top_creators_for_all_journals():
     try:
         return jsonify(db.get_top_authors_in_journals(group_count)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting top authors" + error, 401
+        return "Error getting top creators for all journals" + error, 401
 
 @app.get('/get_top_authors_by_journals_count')
 def get_top_creators_by_journal_count():
+    auth_count = request.args.get('auth_count')
     try:
-        return jsonify(db.get_top_authors_by_journal_count()), 200
+        return jsonify(db.get_top_authors_by_journal_count(auth_count)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting top authors" + error, 401
+        return "Error getting top authors by journal count" + error, 401
 
 @app.get('/get_all_tags_dynamics')
 def get_all_tags_dynamics():
     try:
         return jsonify(db.get_all_tags_dynamics()), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting top authors" + error, 401
+        return "Error getting all tags dynamics" + error, 401
+
+@app.get('/get_venn_diagram')
+def get_venn_diagram():
+    try:
+        return jsonify(db.get_venn_diagram()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting venn diagram" + error, 401
 
 
+@app.get('/get_max_auth')
+def get_max_auth():
+    auth_count = request.args.get('auth_count')
+    try:
+        return jsonify(db.get_max_author_count(auth_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors count" + error, 401
+
+@app.get('/get_max_subj')
+def get_max_tags():
+    subj_count = request.args.get('subj_count')
+    try:
+        return jsonify(db.get_max_subject_count(subj_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors count" + error, 401
 port = int(os.environ.get('PORT', 5000))
 #from waitress import serve
 

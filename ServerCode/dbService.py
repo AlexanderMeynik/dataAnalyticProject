@@ -356,7 +356,7 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-    def get_top_authors_by_journal_count(self):
+    def get_top_authors_by_journal_count(self,auth_count=10):
         rows = []
         cursor = False;
         try:
@@ -366,7 +366,7 @@ class databaseService():
                 select creator,count(creator_num_articles)
                 from journal_top_authors
                 group by creator
-                order by count(creator_num_articles) desc;"""
+                order by count(creator_num_articles) desc limit {auth_count};"""
             )
             self.connection.commit()
             rows = cursor.fetchall()
@@ -383,6 +383,74 @@ class databaseService():
             cursor.execute(
                 f"""
                 select * from all_tags_dynamics;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def get_venn_diagram(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select 'subjects' as name,count(subjects) from  articles
+                union
+                select 'creators' as name,count(creators) from  articles
+                union
+                select 'scopus_id' as name,count(scopus_id) from  articles
+                union
+                select 'subjects+creators' as name,count(array_length(subjects,1)+array_length(creators,1))
+                from  articles
+                union
+                select 'subjects+scopus_id' as name,count(array_length(subjects,1)+articles.scopus_id)
+                from  articles
+                union
+                select 'creators+scopus_id' as name,count(array_length(creators,1)+articles.scopus_id)
+                from  articles
+                union
+                select 'subjects+creators+scopus_id' as name,count(array_length(subjects,1)+array_length(creators,1)+articles.scopus_id)
+                from  articles;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+    def get_max_author_count(self,author_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select article_id,
+                       max(array_length(creators,1)) over (partition by article_id) as creator_count
+                from articles
+                where creators is not null order by creator_count desc limit {author_count};"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+    def get_max_subject_count(self,subj_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select article_id,
+                       max(array_length(subjects,1)) over (partition by article_id) as subject_count
+                from articles
+                where subjects is not null order by subject_count desc limit {subj_count};"""
             )
             self.connection.commit()
             rows = cursor.fetchall()

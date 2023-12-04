@@ -36,16 +36,49 @@ def get_data_for_pie_chart(original_df, arr, selected_main_tag, full=False):
         data_in = pd.concat([data_in, pd.DataFrame([new_row])], ignore_index=True)
     return data_in
 
+if (False):
+    # todo это пример того как можно получить данные для pie_chart на второй стрпанице
+    names_arr_2 = ['main_tag', 'subject', 'percentage', 'total_percentage'];
 
-# todo это пример того как можно получить данные для pie_chart на второй стрпанице
-names_arr_2 = ['main_tag', 'subject', 'percentage', 'total_percentage'];
+    tag_dyn_df2 = pd.DataFrame(
+        dict(zip(names_arr_2, rq.get_top_paired_tags_f_top_tags(10, 10)))
+    )
 
-tag_dyn_df2 = pd.DataFrame(
-    dict(zip(names_arr_2, rq.get_top_paired_tags_f_top_tags(10, 10)))
-)
+    data = get_data_for_pie_chart(tag_dyn_df2, names_arr_2, 'SARS-CoV-2',True)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(data)
+if (False):
+    names_arr_3 = ['journal_names', 'creator', 'articles_published'];
 
-data = get_data_for_pie_chart(tag_dyn_df2, names_arr_2, 'SARS-CoV-2',True)
-print("--- %s seconds ---" % (time.time() - start_time))
-print(data)
+    tag_dyn_df3 = pd.DataFrame(
+        dict(zip(names_arr_3, rq.get_top_authors_for_all_journals()))
+    )
 
+    data=tag_dyn_df3.loc[tag_dyn_df3[names_arr_3[0]] == 'AACE Clinical Case Reports']
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(data)
+
+if (False):
+    names_arr_4 = ['journal_names', 'creator', 'tags_count'];
+
+    tag_dyn_df4 = pd.DataFrame(
+        dict(zip(names_arr_4, rq.get_top_tags_for_all_journals(12)))
+    )
+
+    data=tag_dyn_df4.loc[tag_dyn_df4[names_arr_4[0]] == 'AACE Clinical Case Reports']
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(data)
+if (True):
+    names_arr_5 = ['creator', 'journal_count',];
+
+    tag_dyn_df5 = pd.DataFrame(
+        dict(zip(names_arr_5, rq.get_top_authors_by_journal_num(14)))
+    )
+
+    #data=tag_dyn_df5.loc[tag_dyn_df5[names_arr_5[0]] == 'AACE Clinical Case Reports']
+    data=tag_dyn_df5
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(data)
 # [print(elem) for elem in res]

@@ -208,7 +208,7 @@ class requestor:
         # rnk = [element[3] for element in arrays]  # int[]
         return journal_names, creator, articles_published
 
-    def get_top_authors_by_journal_num(self):
+    def get_top_authors_by_journal_num(self,auth_count=10):
         # это топ авторов по числу журналов, где он опубликовался
         # т.к. у меня нет данных об id автора
         # я не могу точно сказать будет ли 2 Wan Wey одним человеком
@@ -216,7 +216,9 @@ class requestor:
         # todo можео добавить к списку диагармм на 3 странице про журналы
         # стоит брать не все а первые n элементов иначе очень много
 
-        r = requests.get(self.url_start + '/get_top_authors_by_journals_count')
+        r = requests.get(self.url_start + '/get_top_authors_by_journals_count',
+                         params={'auth_count': auth_count}
+                         )
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
 
@@ -236,3 +238,36 @@ class requestor:
         month = [element[2] for element in arrays]  # int[]
         tag_count = [element[3] for element in arrays]  # int[]
         return subject, year, month, tag_count
+
+    def get_venn_diagram(self):
+        r = requests.get(self.url_start + '/get_venn_diagram')
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        set_name = [element[0] for element in arrays]  # string[]
+        cardinality = [element[1] for element in arrays]  # int[]
+        return set_name,cardinality
+
+    def get_max_creators(self, auth_count=10):
+        r = requests.get(self.url_start + '/get_max_auth',
+                         params={'auth_count': auth_count})
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        article_ids = [element[0] for element in arrays]  # string[]
+        author_count = [element[1] for element in arrays]  # int[]
+        return article_ids,author_count
+
+    def get_max_subject(self, subj_count=10):
+        r = requests.get(self.url_start + '/get_max_subj',
+                         params={'subj_count': subj_count})
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        article_ids = [element[0] for element in arrays]  # string[]
+        subject_count = [element[1] for element in arrays]  # int[]
+        return article_ids,subject_count
+
+#rq=requestor()
+#res=rq.get_max_creators(100)
+#[print(elem) for elem in res]
