@@ -267,7 +267,15 @@ class requestor:
         article_ids = [element[0] for element in arrays]  # string[]
         subject_count = [element[1] for element in arrays]  # int[]
         return article_ids,subject_count
+    def get_max_words_count(self, group_count=10):
+        r = requests.get(self.url_start + '/get_max_word_count',
+                         params={'group_count': group_count})
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
 
+        article_ids = [element[0] for element in arrays]  # string[]
+        word_counts = [element[1] for element in arrays]  # int[]
+        return article_ids,word_counts
 #rq=requestor()
-#res=rq.get_max_creators(100)
+#res=rq.get_max_words_count(100)
 #[print(elem) for elem in res]

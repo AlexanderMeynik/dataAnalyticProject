@@ -219,7 +219,7 @@ class databaseService():
             cursor.execute(
                 f"""select auth_count,subj_count,count_articles, round(100*count_articles/(sum(count_articles) over (partition by auth_count)),2) percent from
                         (select array_length(creators,1) as auth_count,array_length(subjects,1) as subj_count,count(article_id) as count_articles,
-                        dense_rank() over (PARTITION BY array_length(creators,1) order by count(article_id) desc ) as rnk
+                        ROW_NUMBER() over (PARTITION BY array_length(creators,1) order by count(article_id) desc ) as rnk
                         from
                         articles
                         where creators is not null and articles.subjects is not null
@@ -458,3 +458,21 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
+    def get_max_tittle_size(self,sizes_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select article_id,max(size) over (partition by article_id) as rnk
+                       from words_tittle
+                order by rnk desc limit {sizes_count};"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+

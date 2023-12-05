@@ -199,6 +199,15 @@ def get_max_tags():
         return jsonify(db.get_max_subject_count(subj_count)), 200
     except (Exception, psycopg2.Error) as error:
         return "Error getting top authors count" + error, 401
+
+@app.get('/get_max_word_count')
+def get_max_word_count():
+    group_count = request.args.get('group_count')
+    try:
+        return jsonify(db.get_max_tittle_size(group_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top authors count" + error, 401
+
 port = int(os.environ.get('PORT', 5000))
 #from waitress import serve
 
