@@ -1,0 +1,7 @@
+pandas
+plotly
+dash
+requests
+scipy
+matplotlib
+matplotlib_venn

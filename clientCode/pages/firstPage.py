@@ -1,20 +1,23 @@
-from datetime import datetime
+import calendar
+from datetime import datetime, date
 
 import dash
+from dash import dash_table
 from dash import dcc, html, Output, Input, callback
 import pandas as pd
 
 import plotly.express as px
 
 from dataRequestService import requestor
+from dateutil.relativedelta import relativedelta
 
 rq = requestor()
 
 paired_tags_df_col_names = ['main_tag', 'subject', 'percentage', 'total_percentage']
 paired_tags_data = pd.DataFrame(
-    dict(zip(paired_tags_df_col_names, rq.get_top_paired_tags_f_top_tags(100, 10)))
+    dict(zip(paired_tags_df_col_names, rq.get_top_paired_tags_f_top_tags(1000, 10)))
 )
-
+pairs_count=1000;
 second_df_names = ['subjects', 'tag_scores']
 # чтобы лишний раз не плодить http запросов
 # я решил просто запросить блок данных, который я масштабирую, если число на слайдере
@@ -35,6 +38,18 @@ tag_dyn_df = pd.DataFrame(
 
 # массив имён колонок для dataframe, который показывает зависимость распределений числа тегов от числа авторов
 
+
+monthly_to_tafs_df_cn = ['subject', 'years', 'months', 'tag_scores']
+monthly_to_tags_df = pd.DataFrame(
+    dict(zip(monthly_to_tafs_df_cn, rq.get_monthly_tags(5)))
+)
+
+years = monthly_to_tags_df[monthly_to_tafs_df_cn[1]].tolist()
+months = monthly_to_tags_df[monthly_to_tafs_df_cn[2]].tolist()
+dates = []
+for i in range(len(years)):
+    dates.append(date(year=int(years[i]), month=int(months[i]), day=1))
+monthly_to_tags_df.insert(4, 'date', dates)
 
 dash.register_page(__name__)
 
@@ -60,6 +75,11 @@ layout = html.Div([
             figure={}, style={'resize': 'horizontal', 'overflow': 'visible'}
         )
     ], style={'display': 'flex', 'resize': 'horizontal', 'overflow': 'auto'}),
+    dcc.DatePickerSingle(id='datePicker', min_date_allowed=date(1978, 8, 5),
+                         max_date_allowed=date(2023, 9, 10),
+                         initial_visible_month=date(2022, 6, 5),
+                         date=date(2022, 6, 5)),
+    html.Div(id="DataTable", children=[])
 ])
 
 
@@ -71,10 +91,19 @@ layout = html.Div([
     config_prevent_initial_callbacks=False
 )
 def refresh_top_tags2(val):
+    global rq
+    global paired_tags_data
+    global pairs_count
+    if(val>pairs_count):
+        paired_tags_data = pd.DataFrame(
+            dict(zip(paired_tags_df_col_names, rq.get_top_paired_tags_f_top_tags(val*2, 10)))
+        )
+        pairs_count = val * 2
+
     global top_tags_data
     if val > top_tags_data[second_df_names[0]].size:  # если
 
-        global rq
+
         top_tags_data = pd.DataFrame(
             dict(zip(second_df_names, rq.get_top_tags(val * 2)))
         )
@@ -125,23 +154,27 @@ def get_data_for_pie_chart(original_df, arr, selected_main_tag, full=False):
     Output("tags_pairs_pie_chart", "figure"),
     Output("tag_dynamics_line_chart", "figure"),
     Input("first_dropdown", "value"),
-    Input("checkList", "value")
+    Input("checkList", "value"),
 )
 def get_graphs(val, val2):
+
+
+
+
     df = tag_dyn_df.loc[tag_dyn_df[tag_dynamic_df_col_names[0]] == val]  # забираем динамику только для ковидла
     years = df[tag_dynamic_df_col_names[1]].tolist()
     months = df[tag_dynamic_df_col_names[2]].tolist()
     dates = []
     for i in range(len(years)):
-        dates.append(datetime(year=int(years[i]), month=int(months[i]), day=1))
+        dates.append(date(year=int(years[i]), month=int(months[i]), day=1))
     df.insert(4, 'datest', dates)
-    # df=df.loc[df[tag_dynamic_df_col_names[3]] >10]
+    #
 
     full = (val2 is not None and len(val2) > 0 and val2[0] == 'selected')
 
     # pie_data=paired_tags_data[paired_tags_data[paired_tags_df_col_names[0]] == val]
     figure = get_data_for_pie_chart(paired_tags_data, paired_tags_df_col_names, val, full)
-
+    df = df.loc[df['datest'] < date(year=2024, month=1, day=1)]
     figure2 = px.line(df,
                       x='datest',
                       y=tag_dynamic_df_col_names[3],
@@ -154,3 +187,44 @@ def get_graphs(val, val2):
     return figure, figure2
 
 
+@callback(
+    Output("DataTable", "children"),
+    Input("datePicker", "date"),
+
+)
+def sdqds(val):
+    val = date.fromisoformat(val)
+    # val=date(val)
+    first_day, day_count = calendar.monthrange(val.year, val.month)
+    a1 = date(year=val.year, month=val.month, day=1)
+    a2 = date(year=val.year, month=val.month, day=day_count)
+
+    data = monthly_to_tags_df.loc[monthly_to_tags_df['date'] == a1]
+    # data = data.loc[data['date'] < a2]
+    data1 = data[[monthly_to_tafs_df_cn[0], monthly_to_tafs_df_cn[3]]]
+
+    output = []
+
+    output.append(html.H2(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
+
+    output.append(dash_table.DataTable(data=data1.to_dict('records'),
+                                            columns=[{"name": i, "id": i} for i in data1.columns],
+                  style_as_list_view=True,
+                  style_cell={'padding': '5px'},
+                  style_header={
+                      'backgroundColor': 'white',
+                      'fontWeight': 'bold'
+                  },
+                  style_cell_conditional=[
+                      {
+                          'if': {'column_id': c},
+                          'textAlign': 'left'
+                      } for c in ['Date', 'Region']
+                  ],
+                  )
+                  )
+
+    output.append(html.P(f"{a1}"))
+    output.append(html.P(f"{a2}"))
+    output.append(html.P(f"{data1}"))
+    return output

@@ -398,23 +398,23 @@ class databaseService():
             cursor = self.connection.cursor()
             cursor.execute(
                 f"""
-                select 'subjects' as name,count(subjects) from  articles
+                select name,count from(select 1 as rnk,'scopus_id' as name,count(scopus_id) from  articles
                 union
-                select 'creators' as name,count(creators) from  articles
+                select 2 as rnk,'creators' as name,count(creators) from  articles
                 union
-                select 'scopus_id' as name,count(scopus_id) from  articles
-                union
-                select 'subjects+creators' as name,count(array_length(subjects,1)+array_length(creators,1))
+                select 3 as rnk,'creators+scopus_id' as name,count(array_length(creators,1)+articles.scopus_id)
                 from  articles
                 union
-                select 'subjects+scopus_id' as name,count(array_length(subjects,1)+articles.scopus_id)
+                select 4 as rnk,'subjects' as name,count(subjects) from  articles
+                union
+                select 5 as rnk,'subjects+scopus_id' as name,count(array_length(subjects,1)+articles.scopus_id)
                 from  articles
                 union
-                select 'creators+scopus_id' as name,count(array_length(creators,1)+articles.scopus_id)
+                select 6 as rnk,'subjects+creators' as name,count(array_length(subjects,1)+array_length(creators,1))
                 from  articles
                 union
-                select 'subjects+creators+scopus_id' as name,count(array_length(subjects,1)+array_length(creators,1)+articles.scopus_id)
-                from  articles;"""
+                select 7 as rnk,'subjects+creators+scopus_id' as name,count(array_length(subjects,1)+array_length(creators,1)+articles.scopus_id)
+                from  articles) order by rnk;"""
             )
             self.connection.commit()
             rows = cursor.fetchall()

@@ -12,10 +12,10 @@ class requestor:
             # print()
             raise RequestException(r.url, r.status_code, r.headers)
 
-    # дофига методов пока не сделано, можно зеркалить класс для api
-    def __init__(self):
-        # пока не упаковал в докер ip будет таким
-        self.url_start = 'http://127.0.0.1:5000'
+    def __init__(self,docker=True):
+        self.url_start = 'http://server_dev:5000'#todo make config for different variants
+        #todo uncoment if run locally
+        #self.url_start = 'http://127.0.0.1:5000'
 
     def get_top_tags(self, tag_count=10):
         r = requests.get(self.url_start + '/top_tags', params={'tag_count': tag_count})
@@ -27,7 +27,6 @@ class requestor:
         return subjects, tag_scores
 
     def get_tag_dynamics(self, tag_name):
-        # todo динамика тега, нужна для динамики популярности тега на стр 1
         r = requests.get(self.url_start + '/tag_dynamics', params={'tag_name': tag_name})
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
@@ -42,7 +41,7 @@ class requestor:
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
 
-        subject = [element[0] for element in arrays]  # todo проверить выходные результаты
+        subject = [element[0] for element in arrays]
         years = [element[1] for element in arrays]  # int[]
         months = [element[2] for element in arrays]  # int[]
         tag_scores = [element[3] for element in arrays]  # string
@@ -92,10 +91,6 @@ class requestor:
         return sizes, element_count
 
     def get_auth_hist(self):
-        # todo станица с гистограммами(гистограмма с распреде по числу авторов)
-        # наверное придётся взять head(60), но скорее больше или что-то того т.к.
-        # есть статьи с таким числом авторов(2654) что там всего 1 такая и будет
-        # и график в этой части прост будет пустым
         r = requests.get(self.url_start + '/auth_count_histogram')
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
@@ -104,7 +99,6 @@ class requestor:
         return auth_count, element_count
 
     def get_auth_subj_count_hist(self, size=10):
-        # пока коды не проверял вообще
         r = requests.get(self.url_start + '/authors_subject_counts_histogram', params={'size': size})
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
@@ -135,9 +129,6 @@ class requestor:
         return creators, article_counts
 
     def get_all_journals_dynamic(self):
-        # todo забрал все динамик журналов по годам
-        # можно забирать статистики для 1 журнала используя pandas
-        # сравнивая name с каким-то val
         r = requests.get(self.url_start + '/get_all_journal_pub_frequency')
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
@@ -149,18 +140,6 @@ class requestor:
         return journal_names, years, months, article_counts
 
     def get_journals_for_dynamics(self, group_count=10):
-        # todo в этом запросе мы получаем журналы для построения динамик
-        # суть запроса состит в том, что для каждого журнала тут
-        # получено его имя, число месяцев, в которые журнал публиковался
-        # если все загруженные здесь статьи были опубликованы в месяци( то это число булет равно 1)
-        # я решил осотртировать данные по числу месяцев( чтобы сначала были журналы
-        # где больше разных месяцев с опубликованными статьсями
-        # т.к. записей может быть слишком много(и у многих журналов характеристки(number_of_months) дублируются)
-        # я добавил поле rank и group count
-        # смысл состоит в том, что если у нас много журналов с number_of_months=10
-        # то для этой группы заберётся максимум group_count элементов
-        # далее в самом падасе можете играться с фильтрами и сортровками
-        # чтобы получать нужную выборку журналов
         r = requests.get(self.url_start + '/get_journals_for_dynamics',
                          params={'group_count': group_count})
         self.check_status(r)
@@ -174,11 +153,6 @@ class requestor:
         return journal_names, number_of_months, articles_published_in_journal, articles_per_month
 
     def get_top_tags_for_all_journals(self, group_count=10):
-        # todo тут мы просто забираем топы group_count журналов для всех
-        # журналов
-        # эти данные нфжны для таблицы или pie диаграммы
-        # на странице 3(про журналы)
-        # чтобы получить топ для журнала с можно в pandas фильтровать по 1(по порядку) ряду
 
         r = requests.get(self.url_start + '/get_top_tags_for_all_journals',
                          params={'group_count': group_count})
@@ -193,8 +167,7 @@ class requestor:
         return journal_names, subject, tag_counts
 
     def get_top_authors_for_all_journals(self, group_count=10):
-        # todo аналогично предыдущему, но выводит top group_count
-        # авторов по числу публикаций в журнале
+
 
         r = requests.get(self.url_start + '/get_top_creators_for_all_journals',
                          params={'group_count': group_count})
@@ -209,13 +182,6 @@ class requestor:
         return journal_names, creator, articles_published
 
     def get_top_authors_by_journal_num(self,auth_count=10):
-        # это топ авторов по числу журналов, где он опубликовался
-        # т.к. у меня нет данных об id автора
-        # я не могу точно сказать будет ли 2 Wan Wey одним человеком
-        # или разными
-        # todo можео добавить к списку диагармм на 3 странице про журналы
-        # стоит брать не все а первые n элементов иначе очень много
-
         r = requests.get(self.url_start + '/get_top_authors_by_journals_count',
                          params={'auth_count': auth_count}
                          )
@@ -227,8 +193,6 @@ class requestor:
         return creator, journal_count
 
     def get_all_tags_dynamics(self):
-        # не знаю зачем, если хотите загрузить 300 мб оперативы можете динамику тегов загружать сразу
-        #и прост отфильтровывать
         r = requests.get(self.url_start + '/get_all_tags_dynamics')
         self.check_status(r)
         arrays = dec.decode(r.content.decode())
