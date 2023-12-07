@@ -17,7 +17,6 @@ class databaseService():
         port = config.get(section, 'port')
 
         reset_count = 0
-        # т.к. звпускаем из  сам сервак из докера теперь строка будет такой)
         while (True):
             try:
                 self.connection = psycopg2.connect(database="postgres",
@@ -36,7 +35,6 @@ class databaseService():
     def __del__(self):
         self.connection.close()
 
-    # неясно пока зачем но пусть будет
 
     def getTopTag(self, num_tags=100):
         rows = []
@@ -65,7 +63,6 @@ class databaseService():
             rows = cursor.fetchall()
 
         finally:
-            # Закрытие курсора и соединения
             if self.connection:
                 cursor.close()
             return rows
@@ -91,7 +88,6 @@ class databaseService():
             self.connection.commit()
             rows = cursor.fetchall()
         finally:
-            # Закрытие курсора и соединения
             if self.connection:
                 cursor.close()
             return rows
@@ -211,7 +207,7 @@ class databaseService():
                 cursor.close()
             return rows
 
-    def authors_subject_counts_hist(self,size=10):
+    def authors_subject_counts_hist(self, size=10):
         rows = []
         cursor = False;
         try:
@@ -277,6 +273,7 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
+
     def get_journal_dynamic_all(self):
         rows = []
         cursor = False;
@@ -284,7 +281,7 @@ class databaseService():
             cursor = self.connection.cursor()
             cursor.execute(
                 'select name,year,month,article_count from journal_dynamic_data'
-                   )
+            )
             self.connection.commit()
             rows = cursor.fetchall()
         finally:
@@ -292,13 +289,13 @@ class databaseService():
                 cursor.close()
             return rows
 
-    def get_journals_for_dynamics(self,group_count=10):
-            rows = []
-            cursor = False;
-            try:
-                cursor = self.connection.cursor()
-                cursor.execute(
-                    f"""with counts_dyn as(
+    def get_journals_for_dynamics(self, group_count=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""with counts_dyn as(
                             select id,name, count(article_count) as mounth_pubs,
                             sum(article_count) as total_articles,
                             sum(article_count)/count(article_count) as articles_per_month
@@ -314,13 +311,13 @@ class databaseService():
                         select name,mounth_pubs,total_articles,articles_per_month,rnk
                         from artic where rnk<={group_count}
                         order by mounth_pubs desc,rnk;"""
-                       )
-                self.connection.commit()
-                rows = cursor.fetchall()
-            finally:
-                if self.connection:
-                    cursor.close()
-                return rows
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
 
     def get_top_tags_in_journals(self, group_count=10):
         rows = []
@@ -339,6 +336,7 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
+
     def get_top_authors_in_journals(self, group_count=10):
         rows = []
         cursor = False;
@@ -356,7 +354,8 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-    def get_top_authors_by_journal_count(self,auth_count=10):
+
+    def get_top_authors_by_journal_count(self, auth_count=10):
         rows = []
         cursor = False;
         try:
@@ -422,7 +421,39 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-    def get_max_author_count(self,author_count=10):
+
+    def get_count_statistics(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""
+                select name,count from (select 'count_tags' as name, 1 as rnk, count(*) as count
+                        from top_tags_all
+                        union
+                        select 'count_articles' as name, 2 as rnk, count(article_id) as count
+                        from articles
+                        union
+                        select 'count_journals' as name, 3 as rnk, count(journal_site_id) as count
+                        from journals
+                        union
+                        select 'avg_articles'as name,4 as rnk,round(avg(count),2) as count from
+                        (select name,count(*) as count
+                        from articles
+                            inner join public.journals j on j.id = articles.journal_id
+                        group by name) as foo
+                        ) as data
+                order by rnk;"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def get_max_author_count(self, author_count=10):
         rows = []
         cursor = False;
         try:
@@ -440,7 +471,8 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-    def get_max_subject_count(self,subj_count=10):
+
+    def get_max_subject_count(self, subj_count=10):
         rows = []
         cursor = False;
         try:
@@ -458,7 +490,8 @@ class databaseService():
             if self.connection:
                 cursor.close()
             return rows
-    def get_max_tittle_size(self,sizes_count=10):
+
+    def get_max_tittle_size(self, sizes_count=10):
         rows = []
         cursor = False;
         try:
@@ -468,6 +501,42 @@ class databaseService():
                 select article_id,max(size) over (partition by article_id) as rnk
                        from words_tittle
                 order by rnk desc limit {sizes_count};"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+
+    def get_by_max_pages(self, count_articles=10):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""with all_pg as(
+                select article_id,abs(convert_to_integer(ending_page)-convert_to_integer(starting_page))+1
+                    as pages
+                from articles
+                order by pages desc)
+                select * from all_pg where  pages is not null limit {count_articles};"""
+            )
+            self.connection.commit()
+            rows = cursor.fetchall()
+        finally:
+            if self.connection:
+                cursor.close()
+            return rows
+    def get_status_pie_chart(self):
+        rows = []
+        cursor = False;
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"""select name,count(*) as count_articles from articles
+                        inner join public.article_statuses on status =article_statuses.id
+                    group by name;"""
             )
             self.connection.commit()
             rows = cursor.fetchall()

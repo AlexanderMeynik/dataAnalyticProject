@@ -55,7 +55,6 @@ def top_mth_tag():
 def tag_pair_top_tags():
     top_count = request.args.get('top_count')
     top_pairs = request.args.get('pair_count')
-    print(top_count, top_pairs)
     try:
         return jsonify(db.top_pairs_top_tags(top_count, top_pairs)), 200
     except (Exception, psycopg2.Error) as error:
@@ -182,7 +181,12 @@ def get_venn_diagram():
         return jsonify(db.get_venn_diagram()), 200
     except (Exception, psycopg2.Error) as error:
         return "Error getting venn diagram" + error, 401
-
+@app.get('/get_count_stats')
+def get_count_stats():
+    try:
+        return jsonify(db.get_count_statistics()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error count stats" + error, 401
 
 @app.get('/get_max_auth')
 def get_max_auth():
@@ -206,13 +210,28 @@ def get_max_word_count():
     try:
         return jsonify(db.get_max_tittle_size(group_count)), 200
     except (Exception, psycopg2.Error) as error:
-        return "Error getting top authors count" + error, 401
+        return "Error getting max title words count" + error, 401
+
+
+@app.get('/get_max_page_count')
+def get_max_page_count():
+    articles_count = request.args.get('articles_count')
+    try:
+        return jsonify(db.get_by_max_pages(articles_count)), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting top articles by page count" + error, 401
+
+
+@app.get('/get_status_pie_chart')
+def get_status_pie():
+    try:
+        return jsonify(db.get_status_pie_chart()), 200
+    except (Exception, psycopg2.Error) as error:
+        return "Error getting status pie chart" + error, 401
 
 port = int(os.environ.get('PORT', 5000))
 #from waitress import serve
 
-
-#app.run(debug=True, host='0.0.0.0', port=port)
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=port)
     #serve(app, host="0.0.0.0", port=port)#todo try to run with waitress+debug=false

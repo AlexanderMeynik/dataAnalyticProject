@@ -31,7 +31,6 @@ size_correlation_df = pd.DataFrame(
 
 dash.register_page(__name__)
 
-# Define the layout of the app
 layout = html.Div([
 
     html.Div([

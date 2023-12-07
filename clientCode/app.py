@@ -1,5 +1,6 @@
 import dash
 from dash import Dash, html, dcc
+from dataRequestService import requestor
 
 app = Dash(__name__, use_pages=True)
 

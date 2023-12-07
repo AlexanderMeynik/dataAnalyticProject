@@ -1,6 +1,5 @@
 import dash
-from dash import html
-from datetime import datetime, date
+from datetime import  date
 from dataRequestService import requestor
 import pandas as pd
 import plotly.express as px
@@ -13,10 +12,8 @@ journals_for_dyn_df_cn = ['journal_names', 'number_of_months', 'articles_publish
                           'articles_per_month']
 
 journals_for_dyn_df = pd.DataFrame(
-    dict(zip(journals_for_dyn_df_cn, rq.get_journals_for_dynamics(2)))
+    dict(zip(journals_for_dyn_df_cn, rq.get_journals_for_dynamics(5)))
 )
-# rem = 5
-# journals_for_dyn_df = journals_for_dyn_df.tail(len(journals_for_dyn_df.index) - rem)
 pd.set_option('display.max_columns', None)
 
 journals_dynamics_df_cn = ['journal_names', 'years', 'months',
@@ -47,7 +44,7 @@ top_auth_all_df = pd.DataFrame(
 )
 
 top_auth_by_jorn_df_cn = ['creator', 'journal_count']
-# я таким образом просто именую наши колонки в dat frame
+
 top_auth_by_jorn_df = pd.DataFrame(
     dict(zip(top_auth_by_jorn_df_cn, rq.get_top_authors_by_journal_num(100)))
 

@@ -7,15 +7,19 @@ dec = json.JSONDecoder();
 
 
 class requestor:
-    def check_status(self, r):
+    @staticmethod
+    def check_status(r):
         if (r.status_code != 200):
             # print()
             raise RequestException(r.url, r.status_code, r.headers)
 
-    def __init__(self,docker=True):
-        self.url_start = 'http://server_dev:5000'#todo make config for different variants
-        #todo uncoment if run locally
-        #self.url_start = 'http://127.0.0.1:5000'
+    def __init__(self, docker=True):
+        try:
+            self.url_start = 'http://server_dev:5000'
+            self.get_status_pie_chart()
+        except:
+            self.url_start = 'http://127.0.2.1:5000'
+        # self.url_start = 'http://127.0.2.1:5000'
 
     def get_top_tags(self, tag_count=10):
         r = requests.get(self.url_start + '/top_tags', params={'tag_count': tag_count})
@@ -168,7 +172,6 @@ class requestor:
 
     def get_top_authors_for_all_journals(self, group_count=10):
 
-
         r = requests.get(self.url_start + '/get_top_creators_for_all_journals',
                          params={'group_count': group_count})
         self.check_status(r)
@@ -181,7 +184,7 @@ class requestor:
         # rnk = [element[3] for element in arrays]  # int[]
         return journal_names, creator, articles_published
 
-    def get_top_authors_by_journal_num(self,auth_count=10):
+    def get_top_authors_by_journal_num(self, auth_count=10):
         r = requests.get(self.url_start + '/get_top_authors_by_journals_count',
                          params={'auth_count': auth_count}
                          )
@@ -210,7 +213,7 @@ class requestor:
 
         set_name = [element[0] for element in arrays]  # string[]
         cardinality = [element[1] for element in arrays]  # int[]
-        return set_name,cardinality
+        return set_name, cardinality
 
     def get_max_creators(self, auth_count=10):
         r = requests.get(self.url_start + '/get_max_auth',
@@ -220,7 +223,7 @@ class requestor:
 
         article_ids = [element[0] for element in arrays]  # string[]
         author_count = [element[1] for element in arrays]  # int[]
-        return article_ids,author_count
+        return article_ids, author_count
 
     def get_max_subject(self, subj_count=10):
         r = requests.get(self.url_start + '/get_max_subj',
@@ -230,7 +233,8 @@ class requestor:
 
         article_ids = [element[0] for element in arrays]  # string[]
         subject_count = [element[1] for element in arrays]  # int[]
-        return article_ids,subject_count
+        return article_ids, subject_count
+
     def get_max_words_count(self, group_count=10):
         r = requests.get(self.url_start + '/get_max_word_count',
                          params={'group_count': group_count})
@@ -239,7 +243,32 @@ class requestor:
 
         article_ids = [element[0] for element in arrays]  # string[]
         word_counts = [element[1] for element in arrays]  # int[]
-        return article_ids,word_counts
-#rq=requestor()
-#res=rq.get_max_words_count(100)
-#[print(elem) for elem in res]
+        return article_ids, word_counts
+
+    def get_max_page_count(self, articles_count=10):
+        r = requests.get(self.url_start + '/get_max_page_count',
+                         params={'articles_count': articles_count})
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        article_ids = [element[0] for element in arrays]  # string[]
+        page_counts = [element[1] for element in arrays]  # int[]
+        return article_ids, page_counts
+
+    def get_status_pie_chart(self):
+        r = requests.get(self.url_start + '/get_status_pie_chart')
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        status = [element[0] for element in arrays]  # string[]
+        article_count = [element[1] for element in arrays]  # int[]
+        return status, article_count
+
+    def get_count_stats(self):
+        r = requests.get(self.url_start + '/get_count_stats')
+        self.check_status(r)
+        arrays = dec.decode(r.content.decode())
+
+        stats = [element[0] for element in arrays]  # string[]
+        article_count = [element[1] for element in arrays]  # int[]
+        return stats, article_count
