@@ -20,8 +20,8 @@ services:
       context: .
       target: server
     container_name: server_container
-    #ports:
-    #  - "5000:5000"
+    ports:
+      - "5000:5000"
     links:
       - db
     profiles:

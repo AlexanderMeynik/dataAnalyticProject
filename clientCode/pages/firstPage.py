@@ -26,7 +26,7 @@ tag_dyn_df = pd.DataFrame(
     dict(zip(tag_dynamic_df_col_names, rq.get_all_tags_dynamics()))
 )
 
-monthly_to_tafs_df_cn = ['subject', 'years', 'months', 'tag_scores']
+monthly_to_tafs_df_cn = ['Ключевое слово', 'years', 'months', 'Число статей']
 monthly_to_tags_df = pd.DataFrame(
     dict(zip(monthly_to_tafs_df_cn, rq.get_monthly_tags(5)))
 )
@@ -97,7 +97,7 @@ def refresh_top_tags2(val):
     figure2 = px.bar(sort_values,
                      x=second_df_names[0], y=second_df_names[1],
                      labels={second_df_names[0]: 'Ключевое слово', second_df_names[1]: 'Количество статей'},
-                     title='Гистограмма распределения количества статей по числу ключевых слов',
+                     title='Блочная диаграмма самых популярных ключевых слов',
 
                      )
     figure2.update_layout()
@@ -181,7 +181,7 @@ def sdqds(val):
 
     output = []
 
-    output.append(html.H2(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
+    output.append(html.H1(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
 
     output.append(dash_table.DataTable(data=data1.to_dict('records'),
                                        columns=[{"name": i, "id": i} for i in data1.columns],

@@ -429,16 +429,16 @@ class databaseService():
             cursor = self.connection.cursor()
             cursor.execute(
                 f"""
-                select name,count from (select 'count_tags' as name, 1 as rnk, count(*) as count
+                select name,count from (select 'Общее число ключевых слов' as name, 1 as rnk, count(*) as count
                         from top_tags_all
                         union
-                        select 'count_articles' as name, 2 as rnk, count(article_id) as count
+                        select 'Общее число статей' as name, 2 as rnk, count(article_id) as count
                         from articles
                         union
-                        select 'count_journals' as name, 3 as rnk, count(journal_site_id) as count
+                        select 'Общее число журналов' as name, 3 as rnk, count(journal_site_id) as count
                         from journals
                         union
-                        select 'avg_articles'as name,4 as rnk,round(avg(count),2) as count from
+                        select 'Среднее число статей на журнал'as name,4 as rnk,round(avg(count),2) as count from
                         (select name,count(*) as count
                         from articles
                             inner join public.journals j on j.id = articles.journal_id

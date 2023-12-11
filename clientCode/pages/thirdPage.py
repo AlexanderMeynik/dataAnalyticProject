@@ -125,7 +125,7 @@ def updateGraphs(val):
                      x='dates',
                      y=journals_dynamics_df_cn[3],
                      labels={'dates': 'Дата', journals_dynamics_df_cn[3]: 'Число статей'},
-                     title=f'Динамика публикаций в журнале {val}'
+                     title=f'Динамика числа публикаций в журнале {val}'
                      )
 
     figure.update_layout(

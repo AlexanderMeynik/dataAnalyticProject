@@ -73,7 +73,7 @@ def refresh_graphs(val):
     pie_plot = px.pie(sort_values, names=size_correlation_df_col_names[1],
                       values=size_correlation_df_col_names[3],
                       labels={size_correlation_df_col_names[1]: 'Число ключевых слов',
-                              size_correlation_df_col_names[3]: 'Количество статей'},
+                              size_correlation_df_col_names[3]: ''},
                       title='Круговая диаграмма распределения статей по количеству '
                             'ключевых слов')
     pie_plot.update()
@@ -81,7 +81,7 @@ def refresh_graphs(val):
     bar_plot = px.bar(sort_values,
                       x=size_correlation_df_col_names[1], y=size_correlation_df_col_names[2],
                       labels={size_correlation_df_col_names[1]: 'Количество ключевых слов',
-                              size_correlation_df_col_names[2]: 'Процент статей'},
+                              size_correlation_df_col_names[2]: 'Количество статей'},
                       title='Гистограмма распределения количества статей по числу ключевых слов',
 
                       )
@@ -101,7 +101,7 @@ def refresh_graphs(val):
                       x=auth_count_hist_df_cn[0], y=auth_count_hist_df_cn[1],
                       labels={auth_count_hist_df_cn[0]: 'Число авторов статьи',
                               auth_count_hist_df_cn[1]: 'Количество статей'},
-                      title='Гистограмма распределения количества статей по числу ключевых авторов',
+                      title='Гистограмма распределения количества статей по числу авторов',
                       )
     auth_bar.update_xaxes(range=[1, 30])
     auth_bar.update_layout()
