@@ -61,10 +61,20 @@ layout = html.Div([
             figure={}, style={'resize': 'horizontal', 'overflow': 'visible'}
         )
     ], style={'display': 'flex', 'resize': 'horizontal', 'overflow': 'auto'}),
-    dcc.DatePickerSingle(id='datePicker', min_date_allowed=date(1978, 8, 5),
+    html.Div(
+        children=[html.Label('Выберите месяц и год',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
+    html.Div(
+    children=[dcc.DatePickerSingle(id='datePicker', min_date_allowed=date(1978, 8, 5),
                          max_date_allowed=date(2023, 9, 10),
                          initial_visible_month=date(2022, 6, 5),
-                         date=date(2022, 6, 5)),
+                         date=date(2022, 6, 5))],
+    style={'display': 'flex',
+            'align-items': 'center',
+            'justify-content': 'center',
+            'padding': '20px'}),
+
     html.Div(id="DataTable", children=[])
 ])
 
@@ -181,8 +191,13 @@ def sdqds(val):
 
     output = []
 
-    output.append(html.H1(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
 
+
+    output.append(html.Div(
+        children=[html.Label(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}", style={'font-size': '20px'})],
+        style={'text-align': 'center'}
+    ))
+    #output.append(html.H1(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
     output.append(dash_table.DataTable(data=data1.to_dict('records'),
                                        columns=[{"name": i, "id": i} for i in data1.columns],
                                        style_cell={

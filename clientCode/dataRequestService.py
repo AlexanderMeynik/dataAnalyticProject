@@ -13,13 +13,8 @@ class requestor:
             # print()
             raise RequestException(r.url, r.status_code, r.headers)
 
-    def __init__(self, docker=True):
-        try:
-            self.url_start = 'http://server_dev:5000'
-            self.get_status_pie_chart()
-        except:
-            self.url_start = 'http://127.0.2.1:5000'
-        # self.url_start = 'http://127.0.2.1:5000'
+    def __init__(self):
+        self.url_start = 'http://server:5000'
 
     def get_top_tags(self, tag_count=10):
         r = requests.get(self.url_start + '/top_tags', params={'tag_count': tag_count})

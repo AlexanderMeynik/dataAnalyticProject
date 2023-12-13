@@ -59,6 +59,7 @@ layout = html.Div([
     dcc.Slider(id="author_top_slider", min=1, value=10, step=1,
                marks={2 ** i: '{}'.format(2 ** i) for i in range(11)},
                tooltip={"placement": "bottom", "always_visible": True}),
+    html.Label('Выбранный журнал:',style={'font-size': '20px','padding': '20px 0px 20px 0px'}),
     dcc.Dropdown(id='journal_select_dropdown', options=lst, value=lst[0]),
 
     dcc.Graph(

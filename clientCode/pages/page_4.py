@@ -47,7 +47,7 @@ max_pages_count_df = pd.DataFrame(
     dict(zip(max_pages_df_cn, rq.get_max_page_count(10)))
 )
 
-count_stats_df_cn = ['Параметр', 'Число']
+count_stats_df_cn = ['Название характеристики', 'Число']
 
 count_stats_df = pd.DataFrame(
     dict(zip(count_stats_df_cn, rq.get_count_stats()))
@@ -64,13 +64,26 @@ dash.register_page(__name__)
 
 
 layout = html.Div([
-    html.H1('Диаграмма Эйлера'),
-    html.Img(id='bar-graph-matplotlib', src=img_src, title="Диаграмма Эйлера множеств статей по наличию поля"),
+    html.Div(
+        children=[html.Label('Диаграмма Эйлера',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
+    html.Div(
+        children=[html.Img(id='bar-graph-matplotlib', src=img_src, title="Диаграмма Эйлера множеств статей по наличию поля")],
+        style={'display': 'block',
+                'margin-left': 'auto',
+                'margin-right': 'auto',
+                'width': '50%'}
+        ),
     dcc.Graph(figure=px.pie(status_pie_df, names=status_pie_df_cn[0],
                             values=status_pie_df_cn[1],
                             labels={status_pie_df_cn[0]: 'Статус',
                                     status_pie_df_cn[1]: 'Количество статей'},
                             title='Круговая диаграмма распределения статей по статусам')),
+    html.Div(
+        children=[html.Label('Таблица статей с самым большим числом ключевых слов',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
     dash_table.DataTable(data=max_subjects_count_df.to_dict('records'),
                                          columns=[{"name": i, "id": i} for i in max_subjects_count_df.columns],
                          style_table={
@@ -120,6 +133,10 @@ layout = html.Div([
                              },
                          ],
                          ),
+    html.Div(
+        children=[html.Label('Таблица статей с самым большим числом авторов',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
     dash_table.DataTable(data=max_creators_count_df.to_dict('records'),
                                          columns=[{"name": i, "id": i} for i in max_creators_count_df.columns],
                          style_table={
@@ -169,6 +186,10 @@ layout = html.Div([
                              },
                          ],
                          ),
+    html.Div(
+        children=[html.Label('Таблица статей с самым большим числом страниц',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
     dash_table.DataTable(data=max_pages_count_df.to_dict('records'),
                                             columns=[{"name": i, "id": i} for i in max_pages_count_df.columns],
                          style_table={
@@ -218,6 +239,10 @@ layout = html.Div([
                              },
                          ],
                          ),
+    html.Div(
+        children=[html.Label('Таблица статей с наибольшим числом слов в заголовке',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
     dash_table.DataTable(data=max_words_count_df.to_dict('records'),
                                             columns=[{"name": i, "id": i} for i in max_words_count_df.columns],
                          style_table={
@@ -267,6 +292,10 @@ layout = html.Div([
                              },
                          ],
                          ),
+    html.Div(
+        children=[html.Label('Таблица с численными характеристиками датасета',style={'font-size': '20px'})],
+        style={'text-align':'center'}
+    ),
     dash_table.DataTable(data=count_stats_df.to_dict('records'),
                                             columns=[{"name": i, "id": i} for i in count_stats_df.columns],
                          style_table={

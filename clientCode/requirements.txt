@@ -5,3 +5,4 @@ requests
 scipy
 matplotlib
 matplotlib_venn
+waitress

@@ -230,8 +230,9 @@ def get_status_pie():
         return "Error getting status pie chart" + error, 401
 
 port = int(os.environ.get('PORT', 5000))
-#from waitress import serve
+
+from waitress import serve
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=port)
-    #serve(app, host="0.0.0.0", port=port)#todo try to run with waitress+debug=false
+    #app.run(host='0.0.0.0',debug=True, port=port)
+    serve(app, host="0.0.0.0", port=port)
