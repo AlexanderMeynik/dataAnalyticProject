@@ -174,7 +174,7 @@ def sdqds(val):
     val = date.fromisoformat(val)
     first_day, day_count = calendar.monthrange(val.year, val.month)
     a1 = date(year=val.year, month=val.month, day=1)
-    #a2 = date(year=val.year, month=val.month, day=day_count)
+    # a2 = date(year=val.year, month=val.month, day=day_count)
 
     data = monthly_to_tags_df.loc[monthly_to_tags_df['date'] == a1]
     data1 = data[[monthly_to_tafs_df_cn[0], monthly_to_tafs_df_cn[3]]]
@@ -185,17 +185,54 @@ def sdqds(val):
 
     output.append(dash_table.DataTable(data=data1.to_dict('records'),
                                        columns=[{"name": i, "id": i} for i in data1.columns],
-                                       style_as_list_view=True,
-                                       style_cell={'padding': '5px'},
+                                       style_cell={
+                                           'padding': '10px',
+                                           'border': '1px solid #ddd',
+                                           'width': '150px',
+                                       },
                                        style_header={
                                            'backgroundColor': 'white',
-                                           'fontWeight': 'bold'
+                                           'fontWeight': 'bold',
+                                           'fontSize': '18px',
                                        },
                                        style_cell_conditional=[
                                            {
                                                'if': {'column_id': c},
-                                               'textAlign': 'left'
+                                               'textAlign': 'left',
+                                               'border': '2px solid #ddd',
+
                                            } for c in ['Date', 'Region']
+                                       ],
+                                       style_table={
+                                           'overflowX': 'auto',  # горизонтальная прокрутка
+                                           'width': '95%',
+                                           'margin': '20px',
+                                           'border': '1px solid #ddd',
+                                           'border-collapse': 'collapse',
+                                           'boxShadow': '0px 0px 15px 0px rgba(0,0,0,0.1)',
+                                           'backgroundColor': '#88BDBC',
+
+                                       },
+                                       style_header_conditional=[
+                                           {'if': {'column_id': 'Date'}, 'textAlign': 'center'},
+                                           {'if': {'column_id': 'Region'}, 'textAlign': 'center'},
+                                       ],
+                                       style_data_conditional=[
+                                           {
+                                               'if': {'row_index': 0},
+                                               'backgroundColor': '#254E58',
+                                               'color': 'white'  # Цвет текста на первой строке
+                                           },
+                                           {
+                                               'if': {'row_index': 'odd'},
+                                               'backgroundColor': '#88BDBC',
+                                               'color': 'white'  # Цвет текста на нечетных строках
+                                           },
+                                           {
+                                               'if': {'row_index': 'even'},
+                                               'backgroundColor': '#88BDBC',
+                                               'color': 'white'  # Цвет текста на четных строках
+                                           },
                                        ],
                                        )
                   )
