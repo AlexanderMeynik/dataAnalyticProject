@@ -12,13 +12,12 @@ journals_for_dyn_df_cn = ['journal_names', 'number_of_months', 'articles_publish
                           'articles_per_month']
 
 journals_for_dyn_df = pd.DataFrame(
-    dict(zip(journals_for_dyn_df_cn, rq.get_journals_for_dynamics(5)))
+    dict(zip(journals_for_dyn_df_cn, rq.get_journals_for_dynamics(12)))
 )
 pd.set_option('display.max_columns', None)
 
 journals_dynamics_df_cn = ['journal_names', 'years', 'months',
                            'article_counts']
-# я таким образом просто именую наши колонки в dat frame
 journals_dynamics_df = pd.DataFrame(
     dict(zip(journals_dynamics_df_cn, rq.get_all_journals_dynamic()))
 )
@@ -113,14 +112,6 @@ def updateGraph(val):
 )
 def updateGraphs(val):
     data = journals_dynamics_df.loc[journals_dynamics_df[journals_dynamics_df_cn[0]] == val]
-
-    '''figure = px.scatter(data,
-                     x=journals_dynamics_df_cn[1],
-                     y=journals_dynamics_df_cn[2],
-                        size=journals_dynamics_df_cn[3],
-                     labels={journals_dynamics_df_cn[1]: 'Год', journals_dynamics_df_cn[2]: 'Месяц'},
-                     #title=f'Круговая диаграмма самых популярных парных ключевых<br>слов для ключевого слова {selected_main_tag}'
-                     )'''
 
     figure = px.line(data,
                      x='dates',

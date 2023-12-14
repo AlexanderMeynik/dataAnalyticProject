@@ -97,7 +97,7 @@ def refresh_top_tags2(val):
         pairs_count = val * 2
 
     global top_tags_data
-    if val > top_tags_data[second_df_names[0]].size:  # если
+    if val > top_tags_data[second_df_names[0]].size:
 
         top_tags_data = pd.DataFrame(
             dict(zip(second_df_names, rq.get_top_tags(val * 2)))
@@ -151,7 +151,7 @@ def get_data_for_pie_chart(original_df, arr, selected_main_tag, full=False):
     Input("checkList", "value"),
 )
 def get_graphs(val, val2):
-    df = tag_dyn_df.loc[tag_dyn_df[tag_dynamic_df_col_names[0]] == val]  # забираем динамику только для ковидла
+    df = tag_dyn_df.loc[tag_dyn_df[tag_dynamic_df_col_names[0]] == val]
     years = df[tag_dynamic_df_col_names[1]].tolist()
     months = df[tag_dynamic_df_col_names[2]].tolist()
     dates = []
@@ -182,22 +182,19 @@ def get_graphs(val, val2):
 )
 def sdqds(val):
     val = date.fromisoformat(val)
-    first_day, day_count = calendar.monthrange(val.year, val.month)
+    #first_day, day_count = calendar.monthrange(val.year, val.month)
     a1 = date(year=val.year, month=val.month, day=1)
-    # a2 = date(year=val.year, month=val.month, day=day_count)
 
     data = monthly_to_tags_df.loc[monthly_to_tags_df['date'] == a1]
     data1 = data[[monthly_to_tafs_df_cn[0], monthly_to_tafs_df_cn[3]]]
 
     output = []
 
-
-
     output.append(html.Div(
         children=[html.Label(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}", style={'font-size': '20px'})],
         style={'text-align': 'center'}
     ))
-    #output.append(html.H1(f"Самые популярные теги в {calendar.month_name[a1.month]} {a1.year}"))
+
     output.append(dash_table.DataTable(data=data1.to_dict('records'),
                                        columns=[{"name": i, "id": i} for i in data1.columns],
                                        style_cell={
@@ -219,7 +216,7 @@ def sdqds(val):
                                            } for c in ['Date', 'Region']
                                        ],
                                        style_table={
-                                           'overflowX': 'auto',  # горизонтальная прокрутка
+                                           'overflowX': 'auto',
                                            'width': '95%',
                                            'margin': '20px',
                                            'border': '1px solid #ddd',
@@ -236,23 +233,19 @@ def sdqds(val):
                                            {
                                                'if': {'row_index': 0},
                                                'backgroundColor': '#254E58',
-                                               'color': 'white'  # Цвет текста на первой строке
+                                               'color': 'white'
                                            },
                                            {
                                                'if': {'row_index': 'odd'},
                                                'backgroundColor': '#88BDBC',
-                                               'color': 'white'  # Цвет текста на нечетных строках
+                                               'color': 'white'
                                            },
                                            {
                                                'if': {'row_index': 'even'},
                                                'backgroundColor': '#88BDBC',
-                                               'color': 'white'  # Цвет текста на четных строках
+                                               'color': 'white'
                                            },
                                        ],
                                        )
                   )
-
-    # output.append(html.P(f"{a1}"))
-    # output.append(html.P(f"{a2}"))
-    # output.append(html.P(f"{data1}"))
     return output
