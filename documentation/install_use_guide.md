@@ -1,7 +1,9 @@
 [На страницу с документацией](README.md)
 # Инструкция по работе и установке
-## Предварительная инициализация
-Для выполнения инициализации потребуется установить файл с [дампом бд](). Его можно получить из дистрибутива на диске.
+На основной странице репозитория имеются 2 релиза данного ПО: fat и lite версии. Fat релиз содержит полный dump с готовой информацией, в то время как lite релиз содержит только необходимые скрипты и конфигурационные файлы.
+## Установка вручную
+### Предварительная инициализация
+Для выполнения инициализации потребуется установить файл с дампом бд из fat([см. последний release](https://github.com/AlexanderMeynik/dataAnalyticProject/releases/tag/fat)). Его можно получить из дистрибутива на диске.
 - Клонируйте репозиторий git clone https://github.com/AlexanderMeynik/dataAnalyticProject
 - Перейдите в рабочую директорию dataAnalyticProject
 - Можно собрать образы заранее docker compose -p data_analytic_project --profile prod --profile db --profile client_prod build(см. [Профили](#профили))
@@ -10,7 +12,7 @@
   - cat <path_to_dump> | docker exec -i database_container psql -U postgres
 - Завершите работу сервиса docker stop database_container&&docker rm database_container
 
-# Инструкция по запуску
+### Инструкция по запуску
 - Для запуска сервисов бд и Rest можно выполнить команду:
   - docker compose -p data_analytic_project --profile prod --profile db up -d
 - После небольшой паузы можно запустить и клиент:
